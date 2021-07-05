@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -32,7 +32,6 @@
     "trailingComma": "es5"
   },
   "name": "aws-apig-lambda-proxy-simple-validator",
-  "author": "haruharuharuby",
   "module": "dist/aws-apig-lambda-proxy-simple-validator.esm.js",
   "size-limit": [
     {
@@ -44,6 +43,11 @@
       "limit": "10 KB"
     }
   ],
+  "author": "hugtech.io",
+  "bugs": {
+    "url": "https://github.com/hugtechio/aws-apig-lambda-proxy-simple-validator/issues"
+  },
+  "homepage": "https://github.com/hugtechio/aws-apig-lambda-proxy-simple-validator#readme",
   "devDependencies": {
     "@size-limit/preset-small-lib": "^5.0.1",
     "@types/aws-lambda": "^8.10.77",
