@@ -191,3 +191,5 @@ export class ApiValidator {
     }
   }
 }
+
+export default ApiValidator
