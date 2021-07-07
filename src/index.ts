@@ -41,7 +41,7 @@ interface SpecList {
 /**
  * Types of Value of Validation Result
  */
-type ResultType = string | number | boolean | object;
+type ResultType = string | number | boolean | object | undefined;
 
 /**
  * Error types
@@ -169,7 +169,7 @@ export class ApiValidator {
     if (typeof val === s.type) {
       return this.convert(val, s.type);
     }
-    return 'type_error';
+    return (s.required) ? 'type_error' : undefined
   }
 
   /**

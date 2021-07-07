@@ -7,6 +7,10 @@ const inputPath = {
   p_string: 'test',
   p_boolean: true,
 };
+const inputPath1 = {
+  p_number: 1,
+  p_string: 'test'
+};
 
 const inputQuery = {
   q_number: 1,
@@ -24,7 +28,7 @@ const inputBody = {
   b_array: [1, 2, 3],
 };
 
-const testRequest = {
+const event1 = {
   requestContext: {
     authorizer: {
       principalId: 'tesuuser',
@@ -34,6 +38,27 @@ const testRequest = {
   queryStringParameters: inputQuery,
   body: JSON.stringify(inputBody),
 };
+
+const event2 = {
+  requestContext: {
+    authorizer: {} 
+  },
+  pathParameters: inputPath,
+  queryStringParameters: inputQuery,
+  body: JSON.stringify(inputBody),
+};
+
+const event3 = {
+  requestContext: {
+    authorizer: {
+      principalId: 'tesuuser',
+    },
+  },
+  pathParameters: inputPath1,
+  queryStringParameters: inputQuery,
+  body: JSON.stringify(inputBody),
+};
+
 /**
  * Test Case Definition
  *
@@ -47,19 +72,24 @@ const testCase: TestCases = [
       name: 'SucceededAllParameters',
       description: 'Specify all kind of parameters',
     },
-    {
-      principalId: 'requestContext:string:required',
-      p_number: 'path:number',
-      p_string: 'path:string',
-      p_boolean: 'path:boolean',
-      q_number: 'query:number',
-      q_string: 'query:string',
-      q_boolean: 'query:boolean',
-      b_number: 'body:number',
-      b_string: 'body:string',
-      b_boolean: 'body:boolean',
-      b_object: 'body:object',
-      b_array: 'body:object',
+    () => {
+      return {
+        event: event1,
+        spec: {
+          principalId: 'requestContext:string:true',
+          p_number: 'path:number',
+          p_string: 'path:string',
+          p_boolean: 'path:boolean',
+          q_number: 'query:number',
+          q_string: 'query:string',
+          q_boolean: 'query:boolean',
+          b_number: 'body:number',
+          b_string: 'body:string',
+          b_boolean: 'body:boolean',
+          b_object: 'body:object',
+          b_array: 'body:object',
+        } 
+      }
     },
     (result, spies) => {
       expect(result.getIsValid()).toBeTruthy();
@@ -88,27 +118,64 @@ const testCase: TestCases = [
       name: 'FailureMissingRequired',
       description: 'Missing Required parameter',
     },
-    {
-      principalId: 'requestContext:string:true',
-      p_required: 'path:string:true',
-      p_number: 'path:number',
-      p_string: 'path:string',
-      p_boolean: 'path:boolean',
-      q_number: 'query:number',
-      q_string: 'query:string',
-      q_boolean: 'query:boolean',
-      b_number: 'body:number',
-      b_string: 'body:string',
-      b_boolean: 'body:boolean',
-      b_object: 'body:object',
-      b_array: 'body:object',
+    () => {
+      return {
+        event: event2,
+        spec: {
+          principalId: 'requestContext:string:true',
+          p_number: 'path:number',
+          p_string: 'path:string',
+          p_boolean: 'path:boolean',
+          q_number: 'query:number',
+          q_string: 'query:string',
+          q_boolean: 'query:boolean',
+          b_number: 'body:number',
+          b_string: 'body:string',
+          b_boolean: 'body:boolean',
+          b_object: 'body:object',
+          b_array: 'body:object',
+        } 
+      }
     },
     (result, spies) => {
       console.log(result);
       expect(result.getIsValid()).toBeFalsy();
       expect(result.getErrors()).toEqual({
-        p_required: 'missing_required',
+        principalId: 'missing_required',
       });
+      if (spies) {
+        console.log(spies);
+      }
+    },
+  ],
+  [
+    {
+      name: 'SucceededMissingNotRequired',
+      description: 'Missing Non Required parameter',
+    },
+    () => {
+      return {
+        event: event3,
+        spec: {
+          principalId: 'requestContext:string:required',
+          p_number: 'path:number',
+          p_string: 'path:string',
+          p_boolean: 'path:boolean',
+          q_number: 'query:number',
+          q_string: 'query:string',
+          q_boolean: 'query:boolean',
+          b_number: 'body:number',
+          b_string: 'body:string',
+          b_boolean: 'body:boolean',
+          b_object: 'body:object',
+          b_array: 'body:object',
+        } 
+      }
+    },
+    (result, spies) => {
+      console.log(result);
+      expect(result.getIsValid()).toBeTruthy();
+      expect(result.getErrors()).toEqual({});
       if (spies) {
         console.log(spies);
       }
@@ -126,9 +193,9 @@ describe.each(testCase)('Validation', (d, r, e) => {
       mocks && mocks[testMeta.name] ? mocks[testMeta.name]() : undefined;
 
     const request = typeof r === 'function' ? r() : r;
-    const validator = new ApiValidator(request);
+    const validator = new ApiValidator(request.spec);
     // @ts-ignore
-    validator.validate(testRequest);
+    validator.validate(request.event);
     const expected = e as TestExpectation;
     // @ts-ignore
     expected(validator, spies);
